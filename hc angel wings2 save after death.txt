@@ -1,0 +1,35 @@
+local rs = game:GetService("ReplicatedStorage")
+local run = game:GetService("RunService")
+local plr = game.Players.LocalPlayer
+
+local function wings(char)
+    local torso = char:WaitForChild("UpperTorso")
+    local hrp = char:WaitForChild("HumanoidRootPart")
+
+    local wing = rs:WaitForChild("EquipableItem"):WaitForChild("Angel Wings"):Clone()
+    wing.Parent = char
+
+    local handle = wing:WaitForChild("Handle")
+    handle.Anchored = false
+    handle.CanCollide = false
+
+    local m = Instance.new("Motor6D")
+    m.Part0 = torso
+    m.Part1 = handle
+    m.C0 = CFrame.new(0,0,0)
+    m.Parent = torso
+
+    local t = 0
+    run.RenderStepped:Connect(function(dt)
+        t += dt * 0.8
+        local speed = math.clamp(hrp.Velocity.Magnitude / 10, 0, 1)
+        local flap = math.sin(t*1.5) * math.rad(10) * (0.5 + speed)
+        local twist = math.sin(t*1.8) * math.rad(3)
+        m.C0 = CFrame.new(0,0,0) * CFrame.Angles(flap,0,twist)
+    end)
+end
+
+if plr.Character then
+    wings(plr.Character)
+end
+plr.CharacterAdded:Connect(wings)
